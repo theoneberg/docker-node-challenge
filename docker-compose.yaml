@@ -5,6 +5,7 @@ services:
     container_name: node
     build:
       context: ./app
+    entrypoint: dockerize -wait tcp://db:3306 -timeout 20s npm start
     environment:
       - PORT=3000
       - DB_HOST=db
@@ -21,20 +22,20 @@ services:
     build:
       context: ./nginx
     ports:
-      - 80:80
+      - 8080:80
     networks:
       - node-network
     depends_on:
       - app
   
   db:
+    container_name: db
     image: mysql:5.7
     command: --innodb-use-native-aio=0
     restart: always
     volumes:
       - mysql-db:/var/lib/mysql
     environment:
-      - PORT=3000
       - MYSQL_DATABASE=nodedb
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_ROOT_USER=root
